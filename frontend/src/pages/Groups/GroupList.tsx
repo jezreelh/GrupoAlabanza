@@ -113,22 +113,6 @@ const GroupList = () => {
     }
   });
 
-  // Mutación para salir de un grupo - actualizada para usar formato de objeto
-  const leaveMutation = useMutation({
-    mutationFn: (groupId: string) => groupService.removeMember(groupId, user?.id || ''),
-    onSuccess: async () => {
-      // Actualizar los datos locales sin recargar totalmente la página
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      
-      // Ya no necesitamos recargar la página completa, la UI se actualiza con el nuevo estado
-      // que viene de la función leaveGroup en el contexto
-    },
-    onError: (error: any) => {
-      console.error('Error en leaveMutation:', error);
-      setError(error.response?.data?.message || 'Error al salir del grupo');
-    }
-  });
-
   // Función para manejar cambios en el formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -206,37 +190,6 @@ const GroupList = () => {
       console.error('Error al unirse al grupo:', error);
       setError(error.response?.data?.message || 'Error al unirse al grupo. Verifica el código de invitación.');
     }
-  };
-
-  // Función para salir de un grupo
-  const handleLeaveGroup = async (groupId: string) => {
-    if (isLoading) return; // Evitar múltiples clics
-    
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      console.log('Iniciando proceso de salir del grupo desde UI:', groupId);
-      
-      // Utilizamos directamente la función del contexto de auth que maneja toda la lógica
-      // en lugar de la mutación que solo interactúa con la API
-      await leaveGroup(groupId);
-      
-      // Invalidar consultas para asegurar que la UI se actualice
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-      
-      console.log('Proceso de salir del grupo completado con éxito');
-    } catch (error: any) {
-      console.error('Error al salir del grupo:', error);
-      setError(error.response?.data?.message || 'Error al salir del grupo');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Verificar si el usuario es miembro de un grupo
-  const isMember = (groupId: string) => {
-    return userGroups.some(group => group._id === groupId);
   };
 
   // Verificar si el grupo está activo
@@ -437,7 +390,7 @@ const GroupList = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleLeaveGroup(group._id)}
+                  onClick={() => leaveGroup(group._id)}
                   className="text-red-600 hover:text-red-800"
                 >
                   Salir del grupo

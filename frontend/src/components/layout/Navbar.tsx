@@ -17,11 +17,6 @@ const Navbar = () => {
   const { user, logout, isAuthenticated, activeGroup, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   return (
     <Disclosure as="nav" className="bg-dark">
       {({ open }) => (

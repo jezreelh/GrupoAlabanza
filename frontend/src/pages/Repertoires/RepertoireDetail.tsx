@@ -1589,7 +1589,7 @@ const RepertoireDetail = () => {
                                 id={`move-down-${song._id}`}
                                 onClick={() => handleMoveSongDown(song._id, index)}
                                 disabled={index === filteredSongs.length - 1}
-                                className={`p-1 rounded-full ${index === filteredSongs.length - 1 ? 'text-gray-300' : 'text-gray-600 hover:bg-gray-100'}`}
+                                className={`p-1 rounded-full ${index === filteredSongs.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}
                                 title="Mover hacia abajo"
                               >
                                 <ArrowDownIcon className="h-4 w-4" />

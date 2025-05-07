@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowUturnLeftIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { songService } from '../../services/api';
@@ -50,9 +50,9 @@ const SongForm = () => {
   const isEditing = !!id;
   const [customTag, setCustomTag] = useState('');
   const [error, setError] = useState('');
-  const { user, activeGroup, userGroups } = useAuth();
+  const { activeGroup, userGroups } = useAuth();
   
-  const { register, handleSubmit, formState: { errors }, control, reset, setValue, watch } = useForm<SongFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<SongFormData>({
     defaultValues: {
       title: '',
       author: '',

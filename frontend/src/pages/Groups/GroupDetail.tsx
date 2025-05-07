@@ -137,7 +137,7 @@ const GroupDetail = () => {
 
   // Verificar si un usuario es moderador
   const isModerator = (userId: string) => {
-    return group?.moderators?.some(mod => mod._id === userId) || false;
+    return group?.moderators?.some((mod: any) => mod._id === userId) || false;
   };
 
   // Verificar si el usuario actual es moderador

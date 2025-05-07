@@ -73,6 +73,7 @@ const Profile = () => {
           ...user,
           username: data.data.username,
           email: data.data.email,
+          id: user?.id
         });
       }
       

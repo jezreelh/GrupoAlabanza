@@ -28,7 +28,7 @@ const RepertoireForm = () => {
   const [error, setError] = useState('');
   const { user, activeGroup, userGroups } = useAuth();
   
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<RepertoireFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<RepertoireFormData>({
     defaultValues: {
       name: '',
       date: new Date().toISOString().split('T')[0],

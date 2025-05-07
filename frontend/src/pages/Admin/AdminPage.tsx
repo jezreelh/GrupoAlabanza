@@ -152,11 +152,9 @@ const AdminPage = () => {
 // Componente para la pestaña de estadísticas
 const StatsTab = () => {
   const { activeGroup } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   
   // Consulta para estadísticas de canciones
-  const { data: songStats } = useQuery({
+  const { data: songStats, isLoading, error } = useQuery({
     queryKey: ['songStats', activeGroup?._id],
     queryFn: () => activeGroup ? songService.getSongStatsByGroup(activeGroup._id) : null,
     enabled: !!activeGroup
