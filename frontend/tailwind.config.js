@@ -105,6 +105,6 @@ module.exports = {
     },
   },
   plugins: [
-    require('@tailwindcss/forms'),
+    // Eliminando la dependencia de @tailwindcss/forms para evitar errores en producción
   ],
 } 

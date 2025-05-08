@@ -1,41 +1,38 @@
 services:
   # Servicio para el backend
   - type: web
-    name: grupoalabanza-backend
+    name: grupo-alabanza-backend
     env: node
     plan: free
-    buildCommand: cd Backend && npm install
-    startCommand: cd Backend && node server.js
+    rootDir: Backend
+    buildCommand: npm install
+    startCommand: npm start
+    region: ohio
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 5000
-      - key: FRONTEND_URL
-        sync: false # Se configurará manualmente en el panel de Render
-      - key: MONGODB_URI
-        sync: false # Se configurará manualmente en el panel de Render
+      - key: DB_CONN_STRING
+        sync: false
       - key: JWT_SECRET
-        sync: false # Se configurará manualmente en el panel de Render
-      - key: JWT_EXPIRATION
-        value: 7d
-    autoDeploy: true
+        sync: false
+      - key: FRONT_URL
+        value: https://grupo-alabanza.onrender.com
+      - key: PORT
+        value: 10000
 
   # Servicio para el frontend
   - type: web
-    name: grupoalabanza-frontend
-    env: static
+    name: grupo-alabanza
+    env: node
     plan: free
-    buildCommand: cd frontend && chmod +x build.sh && ./build.sh
-    staticPublishPath: ./frontend/dist
+    rootDir: frontend
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: npm install -g serve && serve -s dist -l $PORT
+    region: ohio
     envVars:
-      - key: VITE_API_URL
-        fromService:
-          name: grupoalabanza-backend
-          type: web
-          property: url
+      - key: VITE_BACKEND_URL
+        value: https://grupo-alabanza-backend.onrender.com
+      - key: VITE_SKIP_TS_CHECK
+        value: true
     routes:
       - type: rewrite
         source: /*
-        destination: /index.html
-    autoDeploy: true 
+        destination: /index.html 
