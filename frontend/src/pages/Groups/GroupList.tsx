@@ -28,6 +28,13 @@ interface Group {
   members?: string[];
 }
 
+// Función auxiliar para extraer el ID de un objeto o string
+const extractId = (item: any): string => {
+  if (!item) return '';
+  if (typeof item === 'string') return item;
+  return item._id || item.id || '';
+};
+
 const GroupList = () => {
   const { user, userGroups, activeGroup, setActiveGroup, createGroup, loadUserGroups, leaveGroup } = useAuth();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -195,6 +202,28 @@ const GroupList = () => {
   // Verificar si el grupo está activo
   const isActive = (groupId: string) => {
     return activeGroup?._id === groupId;
+  };
+
+  // Verificar si el usuario es miembro de un grupo
+  const isMember = (groupId: string): boolean => {
+    if (!user) return false;
+    
+    const userId = String(user.id);
+    
+    // Buscar el grupo en userGroups
+    const foundGroup = userGroups.find(group => group._id === groupId);
+    if (!foundGroup) return false;
+    
+    // Verificar si el usuario es líder
+    const leaderId = extractId(foundGroup.leader);
+    const isLeader = leaderId === userId;
+    
+    // Verificar si el usuario es miembro
+    const isMemberOfGroup = foundGroup.members && 
+      Array.isArray(foundGroup.members) && 
+      foundGroup.members.some(member => extractId(member) === userId);
+    
+    return Boolean(isLeader || isMemberOfGroup);
   };
 
   return (
@@ -414,7 +443,14 @@ const GroupList = () => {
       ) : allGroups && allGroups.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {allGroups
-            .filter((group: Group) => !isMember(group._id))
+            .filter((group: Group) => {
+              try {
+                return Boolean(!isMember(group._id));
+              } catch (error) {
+                console.error('Error al filtrar grupo:', error);
+                return false;
+              }
+            })
             .map((group: Group) => (
               <Card key={group._id} className="p-6">
                 <h3 className="text-lg font-medium">{group.name}</h3>
