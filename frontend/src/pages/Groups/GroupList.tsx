@@ -378,51 +378,66 @@ const GroupList = () => {
       </div>
       {isLoading ? (
         <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
           <span className="ml-3 text-gray-600">Cargando tus grupos...</span>
         </div>
       ) : userGroups.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {userGroups.map((group) => (
-            <Card key={group._id} className={`p-6 ${isActive(group._id) ? 'border-primary' : ''}`}>
-              <div className="flex justify-between items-start">
-                <Link to={`/groups/${group._id}`} className="hover:text-primary transition-colors">
-                  <h3 className="text-lg font-medium">{group.name}</h3>
-                </Link>
-                {isActive(group._id) ? (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Activo
-                  </span>
-                ) : (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => setActiveGroup(group)}
-                  >
-                    Activar
-                  </Button>
+          {userGroups.map((group, index: number) => (
+            <Card 
+              key={group._id} 
+              className={`p-0 ${isActive(group._id) ? 'border-primary-500 border-l-4' : ''}`}
+              withHover
+              variant={isActive(group._id) ? "primary" : "default"}
+              padding="none"
+              style={{ 
+                animationDelay: `${index * 100}ms`,
+                animation: 'fadeInUp 0.5s ease forwards',
+                opacity: 0,
+                transform: 'translateY(20px)'
+              }}
+            >
+              <div className="p-5">
+                <div className="flex justify-between items-start">
+                  <Link to={`/groups/${group._id}`} className="hover:text-primary-500 transition-colors">
+                    <h3 className="text-lg font-medium">{group.name}</h3>
+                  </Link>
+                  {isActive(group._id) ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                      Activo
+                    </span>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setActiveGroup(group)}
+                      rounded="full"
+                    >
+                      Activar
+                    </Button>
+                  )}
+                </div>
+                {group.church && (
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{group.church}</p>
+                )}
+                {group.description && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">{group.description}</p>
                 )}
               </div>
-              {group.church && (
-                <p className="text-sm text-gray-600 mt-1">Iglesia: {group.church}</p>
-              )}
-              {group.description && (
-                <p className="text-sm text-gray-500 mt-2">{group.description}</p>
-              )}
-              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between">
+              <div className="mt-2 px-5 py-3 border-t border-gray-200 dark:border-dark-700 flex justify-between">
                 <Link 
                   to={`/groups/${group._id}`}
-                  className="text-primary hover:text-primary-dark flex items-center text-sm"
+                  className="text-primary-500 hover:text-primary-600 flex items-center text-sm"
                 >
                   Ver detalles <ArrowRightIcon className="ml-1 h-3 w-3" />
                 </Link>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={() => leaveGroup(group._id)}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-danger-500 hover:text-danger-600"
                 >
-                  Salir del grupo
+                  Salir
                 </Button>
               </div>
             </Card>
@@ -438,7 +453,7 @@ const GroupList = () => {
       <h2 className="text-xl font-semibold mb-4">Otros Grupos</h2>
       {isLoadingGroups ? (
         <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
         </div>
       ) : allGroups && allGroups.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -451,19 +466,34 @@ const GroupList = () => {
                 return false;
               }
             })
-            .map((group: Group) => (
-              <Card key={group._id} className="p-6">
-                <h3 className="text-lg font-medium">{group.name}</h3>
-                {group.church && (
-                  <p className="text-sm text-gray-600 mt-1">Iglesia: {group.church}</p>
-                )}
-                {group.description && (
-                  <p className="text-sm text-gray-500 mt-2">{group.description}</p>
-                )}
-                <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
+            .map((group: Group, index: number) => (
+              <Card 
+                key={group._id} 
+                className="p-0"
+                withHover
+                variant="default"
+                padding="none"
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                  animation: 'fadeInUp 0.5s ease forwards',
+                  opacity: 0,
+                  transform: 'translateY(20px)'
+                }}
+              >
+                <div className="p-5">
+                  <h3 className="text-lg font-medium">{group.name}</h3>
+                  {group.church && (
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{group.church}</p>
+                  )}
+                  {group.description && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">{group.description}</p>
+                  )}
+                </div>
+                <div className="mt-2 px-5 py-3 border-t border-gray-200 dark:border-dark-700 flex justify-end">
                   <Button
                     variant="primary"
                     size="sm"
+                    rounded="md"
                     onClick={() => {
                       setSelectedGroupId(group._id);
                       setShowInvitationCodeModal(true);
