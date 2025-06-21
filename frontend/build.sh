@@ -1,24 +1,34 @@
 #!/bin/bash
-set -e
 
-# Script de compilación para Render.com
+# Script de construcción para el frontend
+echo "🚀 Iniciando construcción del frontend..."
 
-echo "Iniciando compilación del frontend..."
+# Limpiar directorio de build anterior
+echo "🧹 Limpiando directorio de build anterior..."
+rm -rf dist/
 
-# Instalar dependencias
-echo "Instalando dependencias..."
-npm install
-npm install @tailwindcss/forms --save
+# Instalar dependencias si es necesario
+if [ ! -d "node_modules" ]; then
+    echo "📦 Instalando dependencias..."
+    npm install
+fi
 
-# Saltar la verificación de tipos de TypeScript y compilar
-echo "Compilando la aplicación..."
+# Construir la aplicación
+echo "🔨 Construyendo la aplicación..."
 npm run build
 
-echo "Verificando la carpeta dist..."
-if [ -d "dist" ]; then
-  echo "Compilación completada exitosamente ✅"
-  exit 0
+# Verificar que el build fue exitoso
+if [ $? -eq 0 ]; then
+    echo "✅ Build completado exitosamente!"
+    echo "📁 Los archivos están en el directorio 'dist/'"
+    
+    # Mostrar información del build
+    echo "📊 Información del build:"
+    du -sh dist/
+    ls -la dist/
 else
-  echo "Error: La carpeta dist no fue creada. Revisa los logs para más información."
-  exit 1
-fi 
+    echo "❌ Error en el build!"
+    exit 1
+fi
+
+echo "🎉 Frontend listo para despliegue!" 

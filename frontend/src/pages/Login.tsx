@@ -46,10 +46,10 @@ const Login = () => {
       const success = await login({ username: data.username, password: data.password });
       
       if (success) {
-        setLoginStatus('Cargando tus grupos...');
+        setLoginStatus('¡Bienvenido! Redirigiendo...');
         // Esperar un momento antes de redirigir
         setTimeout(() => {
-          navigate('/groups');
+          navigate('/');
         }, 1000);
       } else {
         setError('Error al iniciar sesión. Por favor, intenta nuevamente.');
