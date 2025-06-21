@@ -1,7 +1,20 @@
 {
+  "name": "grupo-alabanza",
+  "version": "1.0.0",
+  "description": "Aplicación para gestión de grupo de alabanza",
+  "scripts": {
+    "start": "echo 'Use npm start en Backend o frontend'",
+    "build": "cd frontend && npm run build"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.4"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

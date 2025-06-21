@@ -18,21 +18,20 @@ services:
       - key: PORT
         value: 10000
 
-  # Servicio para el frontend - configurado como sitio estático
-  - type: static
+  # Servicio para el frontend - con servidor Express personalizado
+  - type: web
     name: grupo-alabanza
-    buildCommand: cd frontend && chmod +x build.sh && ./build.sh
-    staticPublishPath: frontend/dist
+    env: node
+    plan: free
+    rootDir: frontend
+    buildCommand: chmod +x build.sh && ./build.sh && npm install --production
+    startCommand: npm start
     region: ohio
     envVars:
       - key: VITE_BACKEND_URL
         value: https://grupo-alabanza-backend.onrender.com
       - key: VITE_SKIP_TS_CHECK
         value: true
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
 
   # Configuración alternativa como web service (comentada)
   # - type: web
