@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { MusicalNoteIcon, MagnifyingGlassIcon, PlusIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { 
+  MusicalNoteIcon, 
+  MagnifyingGlassIcon, 
+  PlusIcon, 
+  FunnelIcon,
+  DocumentArrowDownIcon
+} from '@heroicons/react/24/outline';
 import { songService } from '../../services/api';
 import Layout from '../../components/layout/Layout';
 import Card from '../../components/ui/Card';
@@ -103,6 +109,23 @@ const SongList = () => {
     if (!song.lastPlayed || !song.playHistory || song.playHistory.length === 0) return null;
     const lastPlayed = song.playHistory[song.playHistory.length - 1].date;
     return formatDate(lastPlayed);
+  };
+
+  // Función para descargar PDF
+  const handleDownloadPDF = (songId: string, songTitle: string, event: React.MouseEvent) => {
+    event.preventDefault(); // Prevenir navegación
+    event.stopPropagation(); // Prevenir propagación del evento
+    
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+    const pdfUrl = `${backendUrl}/api/songs/${songId}/pdf`;
+    
+    // Crear un enlace temporal y hacer click en él para descargar
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `cancion_${songTitle.replace(/\s+/g, '_')}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -220,8 +243,8 @@ const SongList = () => {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSongs.map((song: Song) => (
-            <Link key={song._id} to={`/songs/${song._id}`}>
-              <Card className="h-full transition-all duration-200 hover:shadow-lg hover:border-primary hover:border cursor-pointer">
+            <Card key={song._id} className="h-full transition-all duration-200 hover:shadow-lg hover:border-primary hover:border">
+              <Link to={`/songs/${song._id}`} className="block">
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-lg text-gray-900">{song.title}</h3>
@@ -261,8 +284,19 @@ const SongList = () => {
                     Tocada: {getLastPlayedDate(song)}
                   </div>
                 )}
+              </Link>
+              
+              {/* Botón de descarga PDF */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <button
+                  onClick={(e) => handleDownloadPDF(song._id, song.title, e)}
+                  className="flex items-center text-sm text-gray-600 hover:text-primary transition-colors"
+                >
+                  <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
+                  Descargar PDF
+                </button>
+              </div>
               </Card>
-            </Link>
           ))}
         </div>
       )}

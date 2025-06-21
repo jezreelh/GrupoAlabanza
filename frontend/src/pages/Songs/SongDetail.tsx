@@ -9,7 +9,8 @@ import {
   LinkIcon,
   ClockIcon,
   PlusIcon,
-  XMarkIcon
+  XMarkIcon,
+  DocumentArrowDownIcon
 } from '@heroicons/react/24/outline';
 import { songService } from '../../services/api';
 import Layout from '../../components/layout/Layout';
@@ -152,6 +153,20 @@ const SongDetail = () => {
     }
   };
 
+  // Función para descargar PDF
+  const handleDownloadPDF = () => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+    const pdfUrl = `${backendUrl}/api/songs/${id}/pdf`;
+    
+    // Crear un enlace temporal y hacer click en él para descargar
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `cancion_${song?.title?.replace(/\s+/g, '_') || 'cancion'}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (isLoading) {
     return (
       <Layout>
@@ -201,6 +216,16 @@ const SongDetail = () => {
               Volver
             </Button>
           </Link>
+          
+          {/* Botón para descargar PDF */}
+          <Button 
+            variant="secondary" 
+            onClick={handleDownloadPDF}
+            className="flex items-center"
+          >
+            <DocumentArrowDownIcon className="h-5 w-5 mr-2" />
+            Descargar PDF
+          </Button>
           
           {isAuthenticated && (
             <>

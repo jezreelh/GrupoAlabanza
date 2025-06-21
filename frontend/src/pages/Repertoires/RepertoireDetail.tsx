@@ -176,7 +176,7 @@ interface AllLyricsEditorModalProps {
   versionIndex: number;
 }
 
-// Componente para editar todas las letras juntas como bloc de notas
+// Componente para editar todas las letras juntas como bloc de notas - EDITOR COMPLETAMENTE LIBRE
 const AllLyricsEditorModal: React.FC<AllLyricsEditorModalProps> = ({ 
   isOpen, 
   onClose, 
@@ -184,200 +184,169 @@ const AllLyricsEditorModal: React.FC<AllLyricsEditorModalProps> = ({
   repertoire, 
   versionIndex 
 }) => {
-  // Generar el texto inicial con todas las canciones de forma segura
+  // Estados para el editor libre
+  const [currentText, setCurrentText] = useState<string>('');
+  const [originalText, setOriginalText] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Generar el texto inicial - PRIORIZAR TEXTO GUARDADO LIBRE
   const generateInitialText = () => {
     try {
-      // Verificar si tenemos un repertorio con canciones y versiones
       if (!repertoire || !repertoire.songs || !repertoire.versions) {
-        console.error('Repertorio, canciones o versiones no disponibles');
         return '';
       }
       
-      // Verificar si el índice de versión es válido
       if (versionIndex < 0 || versionIndex >= repertoire.versions.length) {
-        console.error('Índice de versión inválido:', versionIndex);
         return '';
       }
       
       const version = repertoire.versions[versionIndex];
+      if (!version) return '';
       
-      // Verificar si la versión tiene las propiedades necesarias
-      if (!version) {
-        console.error('La versión es nula o indefinida');
-        return '';
+      // NUEVA LÓGICA: Buscar si hay un texto libre guardado
+      // Lo guardamos en la primera canción con una clave especial
+      const freeTextMod = version.songModifications?.find(m => {
+        return m && m.song && (m.song === '__FREE_TEXT__' || (typeof m.song === 'object' && m.song._id === '__FREE_TEXT__'));
+      });
+      
+      if (freeTextMod && freeTextMod.modifiedLyrics) {
+        // Si hay texto libre guardado, usarlo
+        console.log('Usando texto libre guardado');
+        return freeTextMod.modifiedLyrics;
       }
       
-      // Generar el texto para cada canción
+      // Si no hay texto libre guardado, generar desde las canciones individuales
+      console.log('Generando texto desde canciones individuales');
       return repertoire.songs.map((song, index) => {
-        // Verificar si la canción tiene las propiedades necesarias
-        if (!song || !song._id || !song.title) {
-          console.warn('Canción inválida en el índice', index);
-          return '';
-        }
+        if (!song || !song._id || !song.title) return '';
         
-        // Buscar si hay modificaciones para esta canción
+        // Buscar modificaciones para esta canción
         const mod = version.songModifications?.find(m => {
-          try {
-            if (!m) return false;
-            if (!m.song) return false;
-            
-            if (typeof m.song === 'string') return m.song === song._id;
-            return m.song._id === song._id;
-          } catch (error) {
-            console.error('Error al buscar modificaciones de canción:', error);
-            return false;
-          }
+          if (!m || !m.song) return false;
+          if (typeof m.song === 'string') return m.song === song._id;
+          return m.song._id === song._id;
         });
         
         // Usar letra modificada si existe, de lo contrario la original
         const lyrics = mod?.modifiedLyrics || song.lyrics || '';
         
-        // Formatear la canción - formato más simple de bloc de notas
+        // Formato simple
         return `--- CANCIÓN ${index + 1}: ${song.title} ---\n\n${lyrics}\n\n--- FIN CANCIÓN ${index + 1} ---\n\n`;
-      }).filter(Boolean).join(''); // Filtrar elementos vacíos
+      }).filter(Boolean).join('');
     } catch (error) {
       console.error('Error al generar texto inicial:', error);
       return '';
     }
   };
   
-  // Guardar el texto inicial cuando se monta el componente
-  const [initialText, setInitialText] = useState<string>('');
-  
+  // Inicializar textos cuando se abre el modal
   useEffect(() => {
     if (isOpen) {
-      console.log('Generando texto inicial...');
-      const text = generateInitialText();
-      setInitialText(text);
-      setFullText(text);
+      const initialText = generateInitialText();
+      setOriginalText(initialText);
+      setCurrentText(initialText);
     }
   }, [isOpen, repertoire, versionIndex]);
   
+  // Función para restaurar texto original - AHORA SÍ FUNCIONA
   const handleRestoreOriginalText = () => {
-    console.log('Restaurando texto original...');
-    if (initialText) {
-      setFullText(initialText);
-    } else {
-      const text = generateInitialText();
-      setFullText(text);
-      setInitialText(text);
+    console.log('Restaurando al texto original...');
+    
+    // Generar texto desde las canciones originales (sin modificaciones de texto libre)
+    try {
+      if (!repertoire || !repertoire.songs) {
+        setCurrentText('');
+        return;
+      }
+      
+      const originalFromSongs = repertoire.songs.map((song, index) => {
+        if (!song || !song._id || !song.title) return '';
+        
+        // Usar SOLO la letra original de la canción, sin modificaciones
+        const lyrics = song.lyrics || '';
+        
+        return `--- CANCIÓN ${index + 1}: ${song.title} ---\n\n${lyrics}\n\n--- FIN CANCIÓN ${index + 1} ---\n\n`;
+      }).filter(Boolean).join('');
+      
+      setCurrentText(originalFromSongs);
+      console.log('Texto restaurado al original desde canciones base');
+    } catch (error) {
+      console.error('Error al restaurar texto original:', error);
+      setCurrentText(originalText); // Fallback al texto original cargado
     }
   };
   
-  const [fullText, setFullText] = useState(() => generateInitialText());
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Verificar periódicamente que la versión sigue existiendo
-  useEffect(() => {
-    if (!isOpen) return;
-    
-    // Función para verificar si la versión sigue existiendo
-    const checkVersionExists = () => {
-      if (!repertoire || !repertoire.versions || versionIndex >= repertoire.versions.length) {
-        console.error('La versión ya no existe o fue modificada');
-        onClose(); // Cerrar el modal si la versión ya no existe
-        return false;
-      }
-      return true;
-    };
-    
-    // Verificar inmediatamente
-    if (!checkVersionExists()) return;
-    
-    // Regenerar el texto si el repertorio o la versión cambia
-    setFullText(generateInitialText());
-    
-  }, [isOpen, repertoire, versionIndex, onClose]);
-  
+  // Guardar cambios - GUARDAR TEXTO LIBRE COMPLETO
   const handleSaveModifications = () => {
     try {
       setIsSubmitting(true);
       
-      // Asegurarse de que tenemos un repertorio válido con canciones
       if (!repertoire || !repertoire.songs) {
-        console.error('El repertorio o sus canciones no están disponibles');
+        console.error('El repertorio no está disponible');
         setIsSubmitting(false);
         return;
       }
       
+      console.log('Guardando texto libre completo...');
       const modifications: any[] = [];
       
-      // Para cada canción en el repertorio
+      // NUEVA ESTRATEGIA: Guardar el texto completo como texto libre
+      // Usar una ID especial para el texto libre
+      modifications.push({
+        song: '__FREE_TEXT__',
+        modifiedLyrics: currentText
+      });
+      
+      // OPCIONAL: También intentar extraer canciones individuales para compatibilidad
+      // Esto mantiene la funcionalidad existente pero no es la fuente principal
       repertoire.songs.forEach((song, index) => {
         try {
-          // Crear el patrón para buscar el inicio de esta canción
-          const songStartPattern = `--- CANCIÓN ${index + 1}: ${song.title} ---`;
+          const songPattern = `--- CANCIÓN ${index + 1}: ${song.title} ---`;
+          const endPattern = `--- FIN CANCIÓN ${index + 1} ---`;
           
-          // Crear el patrón para buscar el fin de esta canción
-          const songEndPattern = `--- FIN CANCIÓN ${index + 1} ---`;
-          
-          const startIndex = fullText.indexOf(songStartPattern);
-          
-          if (startIndex === -1) {
-            console.warn(`Canción "${song.title}" no encontrada en el texto. Manteniendo letra original.`);
-            // Si no encontramos la canción, mantenemos la letra original pero no la agregamos a las modificaciones
-            return;
-          }
-          
-          // Encontrar el inicio del texto de la canción (después del título y los saltos de línea)
-          const contentStart = startIndex + songStartPattern.length + 2; // +2 por los \n\n
-          
-          // Buscar el fin explícito de la canción
-          let contentEnd = fullText.indexOf(songEndPattern, contentStart);
-          
-          // Si no encontramos el marcador de fin, buscar el inicio de la siguiente canción
-          if (contentEnd === -1) {
-            if (repertoire?.songs && index < repertoire.songs.length - 1) {
+          const startIndex = currentText.indexOf(songPattern);
+          if (startIndex !== -1) {
+            const contentStart = startIndex + songPattern.length + 2;
+            let contentEnd = currentText.indexOf(endPattern, contentStart);
+            
+            if (contentEnd === -1) {
               const nextPattern = `--- CANCIÓN ${index + 2}: `;
-              contentEnd = fullText.indexOf(nextPattern, contentStart);
+              contentEnd = currentText.indexOf(nextPattern, contentStart);
+              if (contentEnd === -1) {
+                contentEnd = currentText.length;
+              }
             }
-          }
-          
-          // Extraer el texto de la canción y eliminar espacios en blanco al inicio y final
-          let songLyrics = fullText.substring(contentStart, contentEnd).trim();
-          
-          // Obtener la versión actual de la letra de la canción para compararla
-          const currentVersion = repertoire?.versions?.[versionIndex];
-          const currentMod = currentVersion?.songModifications?.find(m => {
-            if (typeof m.song === 'string') return m.song === song._id;
-            return m.song?._id === song._id;
-          });
-          
-          const currentLyrics = currentMod?.modifiedLyrics || song.lyrics || '';
-          
-          // Tratar letra vacía como valor explícito, no como "sin cambios"
-          const hasChanged = songLyrics !== currentLyrics;
-          
-          if (hasChanged) {
-            console.log(`Cambios detectados en canción "${song.title}": "${songLyrics.substring(0, 20)}..."`);
-            // Agregar la modificación a la lista
+            
+            const songLyrics = currentText.substring(contentStart, contentEnd).trim();
+            
             modifications.push({
               song: song._id,
               modifiedLyrics: songLyrics
             });
           } else {
-            console.log(`Sin cambios en canción "${song.title}"`);
+            // Si no encuentra la canción, guardar como vacía
+            modifications.push({
+              song: song._id,
+              modifiedLyrics: ''
+            });
           }
         } catch (err) {
           console.error(`Error al procesar canción ${song.title}:`, err);
+          modifications.push({
+            song: song._id,
+            modifiedLyrics: ''
+          });
         }
       });
       
-      console.log('Modificaciones procesadas:', modifications);
+      console.log('Guardando modificaciones libres (incluyendo texto completo):', modifications);
       
-      if (modifications.length === 0) {
-        console.warn('No se detectaron modificaciones para guardar');
-        setIsSubmitting(false);
-        onClose(); // Cerrar modal si no hay modificaciones
-        return;
-      }
-      
-      // Guardar las modificaciones
+      // Llamar onSave con todas las modificaciones
       onSave(modifications);
+      
     } catch (error) {
-      console.error('Error al procesar las letras modificadas:', error);
+      console.error('Error al procesar las modificaciones:', error);
       setIsSubmitting(false);
-      onClose(); // Cerrar el modal si hay un error crítico
     }
   };
   
@@ -389,32 +358,47 @@ const AllLyricsEditorModal: React.FC<AllLyricsEditorModalProps> = ({
         <div className="p-4 border-b sticky top-0 bg-white z-10">
           <h3 className="text-lg font-medium">Editar letras para versión: {repertoire?.versions?.[versionIndex]?.name || 'Sin nombre'}</h3>
           <p className="text-sm text-gray-500 mt-1">
-            Edita las letras de todas las canciones. <strong>Importante:</strong> No elimines los marcadores de inicio y fin de cada canción.
+            <strong>Editor libre:</strong> Puedes agregar, quitar, modificar cualquier texto. Los cambios se guardarán exactamente como los escribas.
           </p>
         </div>
         
         <div className="p-4">
           <textarea
-            value={fullText}
-            onChange={(e) => setFullText(e.target.value)}
-            className="w-full border rounded-md p-2 font-mono text-sm"
+            value={currentText}
+            onChange={(e) => setCurrentText(e.target.value)}
+            className="w-full border rounded-md p-2 font-mono text-sm resize-none"
             style={{ height: '60vh' }}
-            placeholder="Edita todas las letras aquí..."
+            placeholder="Escribe y edita libremente aquí... Puedes agregar, quitar o modificar cualquier cosa."
           />
         </div>
         
         <div className="p-4 border-t sticky bottom-0 bg-white flex justify-between items-center">
-          <Button variant="secondary" onClick={handleRestoreOriginalText}>
+          <button
+            type="button"
+            onClick={handleRestoreOriginalText}
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            disabled={isSubmitting}
+          >
             Restaurar texto original
-          </Button>
+          </button>
           
           <div className="flex space-x-2">
-            <Button variant="outline" onClick={onClose}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              disabled={isSubmitting}
+            >
               Cancelar
-            </Button>
-            <Button onClick={handleSaveModifications} disabled={isSubmitting}>
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveModifications}
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
               {isSubmitting ? "Guardando..." : "Guardar cambios"}
-            </Button>
+            </button>
           </div>
         </div>
       </div>
@@ -1261,6 +1245,14 @@ const RepertoireDetail = () => {
             >
               <DocumentTextIcon className="h-4 w-4 mr-2" />
               Generar PDF
+            </Button>
+            
+            <Button
+              variant="secondary"
+              onClick={() => navigate(`/repertoires/${id}/edit`)}
+            >
+              <PencilIcon className="h-4 w-4 mr-2" />
+              Editar repertorio
             </Button>
             
             <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowUturnLeftIcon } from '@heroicons/react/24/outline';
+import { ArrowUturnLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { repertoireService, songService } from '../../services/api';
 import Layout from '../../components/layout/Layout';
 import Card from '../../components/ui/Card';
@@ -26,6 +26,7 @@ const RepertoireForm = () => {
   const queryClient = useQueryClient();
   const isEditing = !!id;
   const [error, setError] = useState('');
+  const [songSearchTerm, setSongSearchTerm] = useState('');
   const { user, activeGroup, userGroups } = useAuth();
   
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<RepertoireFormData>({
@@ -263,7 +264,7 @@ const RepertoireForm = () => {
             </Card>
             
             {/* Selección de canciones */}
-            <Card title="Canciones" className="md:col-span-2">
+            <Card title={`Canciones ${watch('songs')?.length > 0 ? `(${watch('songs').length} seleccionadas)` : ''}`} className="md:col-span-2">
               {isLoadingSongs ? (
                 <div className="py-4 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mx-auto"></div>
@@ -274,24 +275,100 @@ const RepertoireForm = () => {
                   No hay canciones disponibles. <Link to="/songs/new" className="text-primary hover:underline">Crear una canción</Link> primero.
                 </Alert>
               ) : (
-                <div className="overflow-y-auto max-h-96">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {songsData.map((song: any) => (
-                      <div key={song._id} className="flex items-center p-2 hover:bg-gray-50 rounded">
-                        <input
-                          type="checkbox"
-                          id={`song-${song._id}`}
-                          value={song._id}
-                          className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                          {...register('songs')}
-                        />
-                        <label htmlFor={`song-${song._id}`} className="ml-2 block">
-                          <span className="font-medium">{song.title}</span>
-                          <span className="ml-2 text-sm text-gray-500">({song.key})</span>
-                          {song.author && <p className="text-xs text-gray-500">{song.author}</p>}
-                        </label>
+                <div>
+                  {/* Buscador de canciones */}
+                  <div className="mb-4">
+                    <Input
+                      placeholder="Buscar canciones por nombre..."
+                      type="search"
+                      value={songSearchTerm}
+                      onChange={(e) => setSongSearchTerm(e.target.value)}
+                      icon={<MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />}
+                    />
+                  </div>
+                  
+                  {/* Botones de selección rápida */}
+                  <div className="mb-4 flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const filteredSongs = songsData.filter((song: any) => 
+                          song.title.toLowerCase().includes(songSearchTerm.toLowerCase()) ||
+                          (song.author && song.author.toLowerCase().includes(songSearchTerm.toLowerCase())) ||
+                          (song.key && song.key.toLowerCase().includes(songSearchTerm.toLowerCase()))
+                        );
+                        const currentSongs = watch('songs') || [];
+                        const filteredSongIds = filteredSongs.map((song: any) => song._id);
+                        const newSongs = [...new Set([...currentSongs, ...filteredSongIds])];
+                        reset({ ...watch(), songs: newSongs });
+                      }}
+                    >
+                      Seleccionar {songSearchTerm ? 'filtradas' : 'todas'}
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (songSearchTerm) {
+                          const filteredSongs = songsData.filter((song: any) => 
+                            song.title.toLowerCase().includes(songSearchTerm.toLowerCase()) ||
+                            (song.author && song.author.toLowerCase().includes(songSearchTerm.toLowerCase())) ||
+                            (song.key && song.key.toLowerCase().includes(songSearchTerm.toLowerCase()))
+                          );
+                          const currentSongs = watch('songs') || [];
+                          const filteredSongIds = filteredSongs.map((song: any) => song._id);
+                          const newSongs = currentSongs.filter((songId: string) => !filteredSongIds.includes(songId));
+                          reset({ ...watch(), songs: newSongs });
+                        } else {
+                          reset({ ...watch(), songs: [] });
+                        }
+                      }}
+                    >
+                      Deseleccionar {songSearchTerm ? 'filtradas' : 'todas'}
+                    </Button>
+                  </div>
+                  
+                  {/* Lista de canciones filtradas */}
+                  <div className="overflow-y-auto max-h-96">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {songsData
+                        .filter((song: any) => 
+                          song.title.toLowerCase().includes(songSearchTerm.toLowerCase()) ||
+                          (song.author && song.author.toLowerCase().includes(songSearchTerm.toLowerCase())) ||
+                          (song.key && song.key.toLowerCase().includes(songSearchTerm.toLowerCase()))
+                        )
+                        .map((song: any) => (
+                          <div key={song._id} className="flex items-center p-2 hover:bg-gray-50 rounded">
+                            <input
+                              type="checkbox"
+                              id={`song-${song._id}`}
+                              value={song._id}
+                              className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                              {...register('songs')}
+                            />
+                            <label htmlFor={`song-${song._id}`} className="ml-2 block cursor-pointer flex-1">
+                              <span className="font-medium">{song.title}</span>
+                              <span className="ml-2 text-sm text-gray-500">({song.key})</span>
+                              {song.author && <p className="text-xs text-gray-500">{song.author}</p>}
+                            </label>
+                          </div>
+                        ))}
+                    </div>
+                    
+                    {/* Mensaje cuando no hay resultados */}
+                    {songSearchTerm && songsData.filter((song: any) => 
+                      song.title.toLowerCase().includes(songSearchTerm.toLowerCase()) ||
+                      (song.author && song.author.toLowerCase().includes(songSearchTerm.toLowerCase())) ||
+                      (song.key && song.key.toLowerCase().includes(songSearchTerm.toLowerCase()))
+                    ).length === 0 && (
+                      <div className="text-center py-4 text-gray-500">
+                        No se encontraron canciones que coincidan con "{songSearchTerm}"
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               )}

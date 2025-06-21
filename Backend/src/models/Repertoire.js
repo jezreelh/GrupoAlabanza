@@ -15,8 +15,8 @@ const RepertoireVersionSchema = new mongoose.Schema({
   // Modificaciones específicas para cada canción en esta versión
   songModifications: [{
     song: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Song'
+      type: mongoose.Schema.Types.Mixed, // Permite ObjectId o String para casos especiales como '__FREE_TEXT__'
+      required: true
     },
     // Letra modificada para esta versión (si es diferente de la original)
     modifiedLyrics: String,

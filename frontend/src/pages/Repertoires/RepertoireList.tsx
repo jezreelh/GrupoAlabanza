@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpenIcon, MagnifyingGlassIcon, PlusIcon, CalendarIcon, UserGroupIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, MagnifyingGlassIcon, PlusIcon, CalendarIcon, UserGroupIcon, FunnelIcon, PencilIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { repertoireService } from '../../services/api';
 import Layout from '../../components/layout/Layout';
 import Card from '../../components/ui/Card';

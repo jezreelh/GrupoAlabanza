@@ -16,7 +16,7 @@ rm -rf dist/
 # Instalar dependencias si es necesario
 if [ ! -d "node_modules" ]; then
     echo "📦 Instalando dependencias..."
-    npm install
+npm install
 fi
 
 # Construir la aplicación
@@ -75,7 +75,7 @@ if [ $? -eq 0 ]; then
     
 else
     echo "❌ Error en el build!"
-    exit 1
-fi
+  exit 1
+fi 
 
 echo "🎉 Frontend listo para despliegue!" 
