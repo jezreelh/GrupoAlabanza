@@ -1,1 +1,8 @@
-/* /index.html 200 
+# Configuración de redirects para SPA en Render
+# Todas las rutas que no sean archivos estáticos deben ir a index.html
+/* /index.html 200
+
+# Reglas específicas para archivos estáticos
+/assets/* /assets/:splat 200
+/favicon.ico /favicon.ico 200
+/manifest.json /manifest.json 200 
