@@ -9,7 +9,8 @@ const {
   markSongAsPlayed,
   addMediaLink,
   removeMediaLink,
-  getSongStats
+  getSongStats,
+  generatePDF
 } = require('../controllers/song.controller');
 
 const verifyToken = require('../middlewares/authMiddleware');
@@ -17,6 +18,9 @@ const verifyToken = require('../middlewares/authMiddleware');
 // Rutas públicas
 router.get('/', getAllSongs);
 router.get('/:id', getSongById);
+
+// Ruta para generar PDF
+router.get('/:id/pdf', generatePDF);
 
 // Rutas para estadísticas
 router.get('/stats/group/:groupId', getSongStats);

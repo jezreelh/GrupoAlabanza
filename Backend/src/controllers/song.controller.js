@@ -1,5 +1,6 @@
 const Song = require('../models/Song');
 const Group = require('../models/Group');
+const PDFDocument = require('pdfkit');
 
 // Obtener todas las canciones
 exports.getAllSongs = async (req, res) => {
@@ -376,6 +377,71 @@ exports.getSongStats = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas',
+      error: error.message
+    });
+  }
+};
+
+// Generar PDF de la letra de la canción
+exports.generatePDF = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const song = await Song.findById(id)
+      .populate('group', 'name')
+      .populate('createdBy', 'username');
+    
+    if (!song) {
+      return res.status(404).json({
+        success: false,
+        message: 'Canción no encontrada'
+      });
+    }
+    
+    // Crear un nuevo documento PDF
+    const doc = new PDFDocument();
+    
+    // Configurar la respuesta HTTP para descargar un PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=cancion_${song.title.replace(/\s+/g, '_')}.pdf`);
+    
+    // Enviar el PDF directamente al navegador
+    doc.pipe(res);
+    
+    // Añadir título de la canción
+    doc.fontSize(25).text(song.title, { align: 'center' });
+    doc.moveDown();
+    
+    // Información del autor
+    if (song.author) {
+      doc.fontSize(16).text(`Autor: ${song.author}`, { align: 'center' });
+      doc.moveDown();
+    }
+    
+    // Separador
+    doc.strokeColor('#cccccc')
+      .lineWidth(1)
+      .moveTo(50, doc.y)
+      .lineTo(550, doc.y)
+      .stroke();
+    doc.moveDown();
+    
+    // Letra de la canción
+    if (song.lyrics) {
+      doc.fontSize(18).text('Letra:', { align: 'left' });
+      doc.moveDown(0.5);
+      doc.fontSize(12).text(song.lyrics, { align: 'left' });
+    } else {
+      doc.fontSize(12).text('No hay letra disponible para esta canción.', { align: 'center', style: 'italic' });
+    }
+    
+    // Finalizar el PDF
+    doc.end();
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al generar el PDF',
       error: error.message
     });
   }
