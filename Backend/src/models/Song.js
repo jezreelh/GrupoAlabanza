@@ -90,6 +90,12 @@ SongSchema.methods.addPlay = function(notes = '', event = '') {
     notes,
     event
   });
+  
+  // Mantener solo los últimos 3 registros
+  if (this.playHistory.length > 3) {
+    this.playHistory = this.playHistory.slice(-3);
+  }
+  
   return this.save();
 };
 

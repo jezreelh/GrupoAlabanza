@@ -41,15 +41,15 @@ const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="flex min-h-screen flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-dark-900">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
-          Crea tu cuenta
+        <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+          Crear cuenta
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          ¿Ya tienes una cuenta?{' '}
-          <Link to="/login" className="font-medium text-primary hover:text-blue-500">
-            Inicia sesión aquí
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          O{' '}
+          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+            inicia sesión en tu cuenta existente
           </Link>
         </p>
       </div>
@@ -112,7 +112,7 @@ const Register = () => {
                 isLoading={isLoading}
                 disabled={isLoading}
               >
-                Registrarse
+                {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
               </Button>
             </div>
           </form>
@@ -120,10 +120,10 @@ const Register = () => {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-300 dark:border-dark-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-2 text-gray-500">o continuar con</span>
+                <span className="bg-white dark:bg-dark-800 px-2 text-gray-500 dark:text-gray-400">o continuar con</span>
               </div>
             </div>
 

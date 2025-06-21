@@ -45,17 +45,17 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalProps) =>
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className={`w-full ${sizeClasses[size]} transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all`}>
+              <Dialog.Panel className={`w-full ${sizeClasses[size]} transform overflow-hidden rounded-lg bg-white dark:bg-dark-800 p-6 text-left align-middle shadow-xl transition-all`}>
                 <div className="flex justify-between items-center mb-4">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
+                    className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
                   >
                     {title}
                   </Dialog.Title>
                   <button
                     type="button"
-                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                    className="text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none"
                     onClick={onClose}
                   >
                     <XMarkIcon className="h-6 w-6" aria-hidden="true" />

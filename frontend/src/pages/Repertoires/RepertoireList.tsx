@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpenIcon, MagnifyingGlassIcon, PlusIcon, CalendarIcon, UserGroupIcon, FunnelIcon, PencilIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, MagnifyingGlassIcon, PlusIcon, CalendarIcon, UserGroupIcon, FunnelIcon, PencilIcon, EyeIcon, MusicalNoteIcon } from '@heroicons/react/24/outline';
 import { repertoireService } from '../../services/api';
 import Layout from '../../components/layout/Layout';
 import Card from '../../components/ui/Card';
@@ -30,6 +30,9 @@ type Repertoire = {
     username: string;
   };
   category?: string;
+  event?: string;
+  lastPlayed?: string;
+  playHistory?: string[];
 };
 
 const RepertoireList = () => {
@@ -136,17 +139,13 @@ const RepertoireList = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
       ) : filteredRepertoires?.length === 0 ? (
-        <div className="text-center py-10">
-          <BookOpenIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">No hay repertorios</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm 
-              ? 'No se encontraron repertorios que coincidan con tu búsqueda.' 
-              : showAllGroups 
-                ? 'No hay repertorios en ninguno de tus grupos.' 
-                : `No hay repertorios en el grupo ${activeGroup?.name}.`}
-          </p>
-          {isAuthenticated && !searchTerm && activeGroup && (
+        <div className="text-center py-8">
+          <div className="max-w-md mx-auto">
+            <MusicalNoteIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+            <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No hay repertorios</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Comienza creando tu primer repertorio.
+            </p>
             <div className="mt-6">
               <Link to="/repertoires/new">
                 <Button>
@@ -155,67 +154,67 @@ const RepertoireList = () => {
                 </Button>
               </Link>
             </div>
-          )}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredRepertoires?.map((repertoire: Repertoire) => (
-            <Link key={repertoire._id} to={`/repertoires/${repertoire._id}`}>
-              <Card className="h-full transition-all duration-200 hover:shadow-lg hover:border-primary hover:border cursor-pointer">
+            <Card key={repertoire._id} withHover className="h-full transition-all duration-200 hover:shadow-lg">
+              <Link to={`/repertoires/${repertoire._id}`} className="block h-full">
                 <div className="flex flex-col h-full">
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900">{repertoire.name}</h3>
-                    
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {repertoire.date && (
-                        <div className="flex items-center text-gray-600 text-sm">
-                          <CalendarIcon className="h-4 w-4 mr-1" />
-                          {formatDate(repertoire.date)}
-                        </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{repertoire.name}</h3>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
+                          {repertoire.description || 'Sin descripción'}
+                        </p>
+                      </div>
+                      {repertoire.event && (
+                        <span className="ml-2 px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 text-xs font-medium rounded-full">
+                          {repertoire.event}
+                        </span>
                       )}
-                      
-                      {showAllGroups && repertoire.group && (
-                        <div className="flex items-center text-gray-600 text-sm">
+                    </div>
+                    
+                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mt-3">
+                      <div className="flex items-center">
+                        <CalendarIcon className="h-4 w-4 mr-1" />
+                        {formatDate(repertoire.date)}
+                      </div>
+                      <div className="flex items-center">
+                        <BookOpenIcon className="h-4 w-4 mr-1" />
+                        {repertoire.songs?.length || 0} canciones
+                      </div>
+                      {repertoire.group && (
+                        <div className="flex items-center">
                           <UserGroupIcon className="h-4 w-4 mr-1" />
                           {repertoire.group.name}
                         </div>
                       )}
                     </div>
-                    
-                    {repertoire.description && (
-                      <p className="mt-2 text-gray-600 text-sm line-clamp-2">{repertoire.description}</p>
-                    )}
                   </div>
                   
-                  <div className="mt-4 flex-grow">
-                    <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
-                      Canciones ({repertoire.songs?.length || 0})
-                    </h4>
-                    <ul className="space-y-1">
-                      {repertoire.songs?.slice(0, 3).map(song => (
-                        <li key={song._id} className="text-sm">
-                          <div className="flex justify-between items-center">
-                            <span className="truncate">{song.title}</span>
-                            <span className="ml-2 text-xs bg-gray-100 px-1.5 py-0.5 rounded">
-                              {song.key}
-                            </span>
-                          </div>
-                        </li>
-                      ))}
-                      {repertoire.songs && repertoire.songs.length > 3 && (
-                        <li className="text-xs text-gray-500 italic">
-                          Y {repertoire.songs.length - 3} más...
-                        </li>
+                  {/* Estado del repertorio */}
+                  <div className="mt-4 pt-3 border-t border-gray-200 dark:border-dark-600">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                        {repertoire.lastPlayed ? (
+                          <>Último toque: {formatDate(repertoire.lastPlayed)}</>
+                        ) : (
+                          <>Sin tocar aún</>
+                        )}
+                      </div>
+                      {repertoire.playHistory && repertoire.playHistory.length > 0 && (
+                        <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">
+                          Tocado {repertoire.playHistory.length} {repertoire.playHistory.length === 1 ? 'vez' : 'veces'}
+                        </span>
                       )}
-                    </ul>
-                  </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-                    Creado por: {repertoire.createdBy?.username || 'Usuario desconocido'}
+                    </div>
                   </div>
                 </div>
-              </Card>
-            </Link>
+              </Link>
+            </Card>
           ))}
         </div>
       )}

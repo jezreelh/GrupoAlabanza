@@ -7,6 +7,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { songService, repertoireService } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { formatDate } from '../utils/dateUtils';
 
 // Nota: Para implementar un diseño de Figma en el futuro:
 // 1. Exporta los componentes SVG/imágenes desde Figma
@@ -167,17 +168,20 @@ const Home = () => {
             ) : (
               <div className="space-y-3">
                 {songs.slice(0, recentCount).map((song: any) => (
-                  <Link key={song._id} to={`/songs/${song._id}`}>
-                    <Card className="p-4 hover:shadow-md transition-shadow flex justify-between items-center">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{song.title}</h3>
-                        <p className="text-gray-600 text-sm">{song.author}</p>
+                  <Card key={song._id} withHover className="cursor-pointer">
+                    <Link to={`/songs/${song._id}`}>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{song.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm">{song.author}</p>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 px-2 py-1 rounded">
+                          {song.key}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {song.category}
+                        </span>
                       </div>
-                      <div className="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-800">
-                        {song.key}
-                      </div>
-                    </Card>
-                  </Link>
+                    </Link>
+                  </Card>
                 ))}
               </div>
             )}
@@ -207,17 +211,20 @@ const Home = () => {
             ) : (
               <div className="space-y-3">
                 {repertoires.slice(0, recentCount).map((rep: any) => (
-                  <Link key={rep._id} to={`/repertoires/${rep._id}`}>
-                    <Card className="p-4 hover:shadow-md transition-shadow">
-                      <h3 className="font-semibold text-gray-900">{rep.name}</h3>
-                      <div className="flex items-center text-sm text-gray-600 mt-1">
-                        <CalendarIcon className="h-4 w-4 mr-1" />
-                        {new Date(rep.date).toLocaleDateString()}
-                        <span className="mx-2">•</span>
-                        <span>{rep.songs?.length || 0} canciones</span>
+                  <Card key={rep._id} withHover className="cursor-pointer">
+                    <Link to={`/repertoires/${rep._id}`}>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">{rep.name}</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm">{rep.description}</p>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {formatDate(rep.date)}
+                        </span>
+                        <span className="text-xs bg-secondary-100 dark:bg-secondary-900 text-secondary-800 dark:text-secondary-200 px-2 py-1 rounded">
+                          {rep.songs?.length || 0} canciones
+                        </span>
                       </div>
-                    </Card>
-                  </Link>
+                    </Link>
+                  </Card>
                 ))}
               </div>
             )}

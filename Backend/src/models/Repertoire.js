@@ -119,6 +119,12 @@ RepertoireSchema.methods.addPlay = function(notes = '', event = '', versionIndex
     event,
     versionIndex
   });
+  
+  // Mantener solo los últimos 3 registros
+  if (this.playHistory.length > 3) {
+    this.playHistory = this.playHistory.slice(-3);
+  }
+  
   return this.save();
 };
 

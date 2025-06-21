@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { 
   MusicalNoteIcon, 
   MagnifyingGlassIcon, 
   PlusIcon, 
   FunnelIcon,
-  DocumentArrowDownIcon
+  DocumentArrowDownIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline';
 import { songService } from '../../services/api';
 import Layout from '../../components/layout/Layout';
@@ -15,7 +16,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate } from '../../utils/dateUtils';
+import { formatDate, getRelativeTimeText } from '../../utils/dateUtils';
 
 type Song = {
   _id: string;
@@ -44,6 +45,7 @@ const SongList = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const { activeGroup } = useAuth();
+  const navigate = useNavigate();
   
   const { isLoading, error, data } = useQuery({
     queryKey: ['songs', activeGroup?._id],
@@ -126,6 +128,18 @@ const SongList = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // Función para obtener el color de la categoría
+  const getCategoryColor = (category: string) => {
+    switch(category) {
+      case 'Adoración': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'Alabanza': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'Jubilo': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+      case 'Ofrenda': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'Comunión': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    }
   };
 
   return (
@@ -221,82 +235,74 @@ const SongList = () => {
           No hay un grupo activo seleccionado. Por favor, selecciona o crea un grupo para ver sus canciones.
         </Alert>
       ) : filteredSongs.length === 0 ? (
-        <div className="text-center py-10">
-          <MusicalNoteIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">No hay canciones</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {selectedCategory || selectedTag || searchTerm
-              ? 'No se encontraron canciones que coincidan con los filtros aplicados.'
-              : 'Comienza añadiendo tu primera canción.'}
-          </p>
-          {!(selectedCategory || selectedTag || searchTerm) && (
+        <div className="text-center py-8 col-span-full">
+          <div className="max-w-md mx-auto">
+            <MusicalNoteIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+            <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No hay canciones</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Comienza agregando tu primera canción.
+            </p>
             <div className="mt-6">
               <Link to="/songs/new">
                 <Button>
                   <PlusIcon className="h-5 w-5 mr-2" />
-                  Nueva Canción
+                  Agregar canción
                 </Button>
               </Link>
             </div>
-          )}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSongs.map((song: Song) => (
-            <Card key={song._id} className="h-full transition-all duration-200 hover:shadow-lg hover:border-primary hover:border">
+            <Card 
+              key={song._id} 
+              withHover 
+              className="transition-all duration-200 hover:shadow-lg"
+            >
               <Link to={`/songs/${song._id}`} className="block">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900">{song.title}</h3>
-                    <p className="text-gray-600 text-sm">{song.author}</p>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{song.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mt-1">
+                      {song.author && `Autor: ${song.author}`}
+                      {song.author && song.key && ' • '}
+                      {song.key && `Tonalidad: ${song.key}`}
+                    </p>
+                    
+                    {/* Categoría */}
+                    {song.category && (
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(song.category)}`}>
+                          {song.category}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Tags */}
+                    {song.tags && song.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {song.tags.map((tag: string, index: number) => (
+                          <span 
+                            key={index}
+                            className="px-2 py-1 text-xs bg-gray-100 dark:bg-dark-700 text-gray-600 dark:text-gray-300 rounded"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div className="bg-gray-100 px-2 py-1 rounded text-xs font-medium text-gray-800">
-                    {song.key}
+                  
+                  <div className="ml-4 flex-shrink-0">
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <ClockIcon className="h-4 w-4 mr-1" />
+                      Canción
+                    </div>
                   </div>
                 </div>
-
-                <div className="mt-3 flex items-center">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    song.category === 'Adoración' ? 'bg-blue-100 text-blue-800' :
-                    song.category === 'Alabanza' ? 'bg-green-100 text-green-800' :
-                    song.category === 'Jubilo' ? 'bg-orange-100 text-orange-800' :
-                    song.category === 'Ofrenda' ? 'bg-yellow-100 text-yellow-800' :
-                    song.category === 'Comunión' ? 'bg-purple-100 text-purple-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {song.category || 'Sin categoría'}
-                  </span>
-                </div>
-
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {song.tags?.map((tag: string, index: number) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {getLastPlayedDate(song) && (
-                  <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-                    Tocada: {getLastPlayedDate(song)}
-                  </div>
-                )}
               </Link>
-              
-              {/* Botón de descarga PDF */}
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <button
-                  onClick={(e) => handleDownloadPDF(song._id, song.title, e)}
-                  className="flex items-center text-sm text-gray-600 hover:text-primary transition-colors"
-                >
-                  <DocumentArrowDownIcon className="h-4 w-4 mr-2" />
-                  Descargar PDF
-                </button>
-              </div>
-              </Card>
+            </Card>
           ))}
         </div>
       )}

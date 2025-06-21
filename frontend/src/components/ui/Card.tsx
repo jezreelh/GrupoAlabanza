@@ -1,3 +1,4 @@
+import React from 'react';
 import type { ReactNode, CSSProperties } from 'react';
 
 interface CardProps {
@@ -5,36 +6,36 @@ interface CardProps {
   title?: string;
   className?: string;
   withHover?: boolean;
-  withBorder?: boolean;
-  rounded?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-  variant?: 'default' | 'primary' | 'secondary' | 'accent' | 'dark';
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'default' | 'outlined' | 'elevated';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   style?: CSSProperties;
+  onClick?: () => void;
 }
 
-const Card = ({ 
+const Card: React.FC<CardProps> = ({ 
   children, 
   title, 
   className = '', 
   withHover = false, 
-  withBorder = false,
   rounded = 'lg',
   variant = 'default',
   padding = 'md',
-  style
-}: CardProps) => {
+  style,
+  onClick
+}) => {
   // Clases base
   const baseClasses = 'bg-white dark:bg-dark-800 overflow-hidden transition-all duration-200';
   
   // Clases de bordes redondeados
   const roundedClasses = {
+    none: 'rounded-none',
     sm: 'rounded-sm',
     md: 'rounded-md',
     lg: 'rounded-lg',
-    xl: 'rounded-xl',
-    '2xl': 'rounded-2xl'
+    xl: 'rounded-xl'
   };
-
+  
   // Clases de padding
   const paddingClasses = {
     none: '',
@@ -43,26 +44,29 @@ const Card = ({
     lg: 'p-6'
   };
   
-  // Clases de variantes
+  // Clases de variante
   const variantClasses = {
-    default: `shadow-card ${withBorder ? 'border border-gray-200 dark:border-dark-700' : ''}`,
-    primary: `border-l-4 border-primary-500 shadow-card ${withBorder ? 'border border-gray-200 dark:border-dark-700' : ''}`,
-    secondary: `border-l-4 border-secondary-500 shadow-card ${withBorder ? 'border border-gray-200 dark:border-dark-700' : ''}`,
-    accent: `border-l-4 border-accent-500 shadow-card ${withBorder ? 'border border-gray-200 dark:border-dark-700' : ''}`,
-    dark: `border-l-4 border-dark-500 shadow-card ${withBorder ? 'border border-gray-200 dark:border-dark-700' : ''}`
+    default: 'border border-gray-200 dark:border-dark-600 shadow-sm dark:shadow-dark-900/20',
+    outlined: 'border-2 border-gray-300 dark:border-dark-500',
+    elevated: 'shadow-lg dark:shadow-dark-900/40 border border-gray-100 dark:border-dark-700'
   };
   
   // Clases de hover
-  const hoverClasses = withHover ? 'hover:shadow-card-hover transform hover:-translate-y-1' : '';
+  const hoverClasses = withHover 
+    ? 'hover:shadow-md dark:hover:shadow-dark-900/40 hover:border-gray-300 dark:hover:border-dark-500 cursor-pointer' 
+    : '';
   
+  const clickableClasses = onClick ? 'cursor-pointer' : '';
+
   return (
-    <div 
-      className={`${baseClasses} ${roundedClasses[rounded]} ${paddingClasses[padding]} ${variantClasses[variant]} ${hoverClasses} ${className}`}
+    <div
+      className={`${baseClasses} ${roundedClasses[rounded]} ${paddingClasses[padding]} ${variantClasses[variant]} ${hoverClasses} ${clickableClasses} ${className}`}
       style={style}
+      onClick={onClick}
     >
       {title && (
-        <div className="border-b border-gray-200 dark:border-dark-700 px-4 py-3 mb-3">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{title}</h3>
+        <div className="border-b border-gray-200 dark:border-dark-600 px-4 py-3 mb-3">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">{title}</h3>
         </div>
       )}
       <div className={title ? '' : padding !== 'none' ? '' : 'p-4'}>

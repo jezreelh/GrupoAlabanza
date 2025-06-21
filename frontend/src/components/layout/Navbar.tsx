@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, UserCircleIcon, UserGroupIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
@@ -20,8 +20,25 @@ const navigation = [
 const Navbar = ({ scrolled = false }: NavbarProps) => {
   const { user, logout, isAuthenticated, activeGroup, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Para una futura implementación del modo oscuro
+  // Detectar el estado actual del modo oscuro
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+    
+    checkDarkMode();
+    // Observar cambios en la clase dark
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const toggleDarkMode = () => {
     document.documentElement.classList.toggle('dark');
   };
@@ -71,21 +88,26 @@ const Navbar = ({ scrolled = false }: NavbarProps) => {
                   </div>
                 )}
                 
-                {/* Botón para modo oscuro - para implementación futura */}
+                {/* Botón para modo oscuro */}
                 <button 
                   onClick={toggleDarkMode}
-                  className="p-1 rounded-full text-gray-300 hover:bg-dark-700 hover:text-white mr-2"
+                  className="p-1 rounded-full text-gray-300 hover:bg-dark-700 hover:text-white mr-2 transition-colors"
+                  title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
                 >
                   <span className="sr-only">Cambiar tema</span>
-                  <SunIcon className="h-6 w-6" />
+                  {isDarkMode ? (
+                    <SunIcon className="h-6 w-6" />
+                  ) : (
+                    <MoonIcon className="h-6 w-6" />
+                  )}
                 </button>
                 
                 {isAuthenticated ? (
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+                      <Menu.Button className="flex rounded-full bg-dark-700 dark:bg-dark-600 p-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-800 transition-colors">
                         <span className="sr-only">Abrir menú de usuario</span>
-                        <UserCircleIcon className="h-8 w-8 text-gray-600" />
+                        <UserCircleIcon className="h-8 w-8 text-gray-300 dark:text-gray-200" />
                       </Menu.Button>
                     </div>
                     <Transition
@@ -208,9 +230,14 @@ const Navbar = ({ scrolled = false }: NavbarProps) => {
                   <span className="text-sm text-gray-400">Tema:</span>
                   <button 
                     onClick={toggleDarkMode}
-                    className="p-1 rounded-full text-gray-300 hover:bg-dark-700 hover:text-white"
+                    className="p-1 rounded-full text-gray-300 hover:bg-dark-700 hover:text-white transition-colors"
+                    title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
                   >
-                    <SunIcon className="h-5 w-5" />
+                    {isDarkMode ? (
+                      <SunIcon className="h-5 w-5" />
+                    ) : (
+                      <MoonIcon className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </div>

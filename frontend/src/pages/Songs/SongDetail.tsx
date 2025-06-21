@@ -452,15 +452,15 @@ const SongDetail = () => {
         <Card title="Historial de reproducción">
           {song.playHistory && song.playHistory.length > 0 ? (
             <div className="space-y-2">
-              {[...song.playHistory].reverse().slice(0, 10).map((playRecord: any, index: number) => (
+              {[...song.playHistory].reverse().slice(0, 3).map((playRecord: any, index: number) => (
                 <div key={index} className="flex items-center">
                   <ClockIcon className="h-4 w-4 text-gray-400 mr-2" />
                   <div className="text-sm">{getRelativeTimeText(playRecord.date)}</div>
                 </div>
               ))}
-              {song.playHistory.length > 10 && (
+              {song.playHistory.length > 3 && (
                 <div className="text-xs text-gray-500 mt-2">
-                  Mostrando las 10 más recientes de {song.playHistory.length} fechas
+                  Mostrando las 3 más recientes de {song.playHistory.length} fechas
                 </div>
               )}
             </div>

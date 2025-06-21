@@ -115,16 +115,16 @@ const VersionModal: React.FC<VersionModalProps> = ({
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-md">
-        <div className="p-4 border-b">
-          <h3 className="text-lg font-medium">
+      <div className="bg-white dark:bg-dark-800 rounded-lg w-full max-w-md">
+        <div className="p-4 border-b border-gray-200 dark:border-dark-600">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             {editingVersion ? 'Editar Versión' : 'Nueva Versión'}
           </h3>
         </div>
         
         <div className="p-4">
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Nombre de la versión</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Nombre de la versión</label>
             <Input
               type="text"
               value={name}
@@ -134,18 +134,18 @@ const VersionModal: React.FC<VersionModalProps> = ({
           </div>
           
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Notas (opcional)</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Notas (opcional)</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full border rounded-md p-2"
+              className="w-full border border-gray-300 dark:border-dark-600 rounded-md p-2 bg-white dark:bg-dark-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
               rows={3}
               placeholder="Ej. Esta versión tiene acordes para guitarra acústica"
             />
           </div>
         </div>
         
-        <div className="p-4 border-t flex justify-between items-center">
+        <div className="p-4 border-t border-gray-200 dark:border-dark-600 flex justify-between items-center">
           <div>
             {editingVersion && onDelete && (
               <Button variant="danger" onClick={onDelete}>
@@ -354,9 +354,9 @@ const AllLyricsEditorModal: React.FC<AllLyricsEditorModalProps> = ({
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] overflow-auto">
-        <div className="p-4 border-b sticky top-0 bg-white z-10">
-          <h3 className="text-lg font-medium">Editar letras para versión: {repertoire?.versions?.[versionIndex]?.name || 'Sin nombre'}</h3>
+      <div className="bg-white dark:bg-dark-800 rounded-lg w-full max-w-5xl max-h-[90vh] overflow-auto">
+        <div className="p-4 border-b sticky top-0 bg-white dark:bg-dark-700 z-10">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Editar letras para versión: {repertoire?.versions?.[versionIndex]?.name || 'Sin nombre'}</h3>
           <p className="text-sm text-gray-500 mt-1">
             <strong>Editor libre:</strong> Puedes agregar, quitar, modificar cualquier texto. Los cambios se guardarán exactamente como los escribas.
           </p>
@@ -366,17 +366,17 @@ const AllLyricsEditorModal: React.FC<AllLyricsEditorModalProps> = ({
           <textarea
             value={currentText}
             onChange={(e) => setCurrentText(e.target.value)}
-            className="w-full border rounded-md p-2 font-mono text-sm resize-none"
+            className="w-full border border-gray-300 dark:border-dark-600 rounded-md p-2 bg-white dark:bg-dark-700 text-gray-900 dark:text-white font-mono text-sm resize-none"
             style={{ height: '60vh' }}
             placeholder="Escribe y edita libremente aquí... Puedes agregar, quitar o modificar cualquier cosa."
           />
         </div>
         
-        <div className="p-4 border-t sticky bottom-0 bg-white flex justify-between items-center">
+        <div className="p-4 border-t sticky bottom-0 bg-white dark:bg-dark-700 flex justify-between items-center">
           <button
             type="button"
             onClick={handleRestoreOriginalText}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            className="px-4 py-2 bg-gray-100 dark:bg-dark-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors"
             disabled={isSubmitting}
           >
             Restaurar texto original
@@ -386,7 +386,7 @@ const AllLyricsEditorModal: React.FC<AllLyricsEditorModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-dark-500 transition-colors"
               disabled={isSubmitting}
             >
               Cancelar
@@ -1409,26 +1409,26 @@ const RepertoireDetail = () => {
           <Card className="mb-6">
             <h2 className="text-lg font-semibold mb-4">Historial de reproducciones</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-600">
+                <thead className="bg-gray-50 dark:bg-dark-700">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Fecha
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Versión
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Evento
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Notas
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {[...repertoireData.playHistory].reverse().map((play: any, index: number) => (
-                    <tr key={index} className="hover:bg-gray-50">
+                <tbody className="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-dark-600">
+                  {[...repertoireData.playHistory].reverse().slice(0, 3).map((play: any, index: number) => (
+                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-dark-700">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{formatDate(play.date)}</div>
                       </td>
@@ -1457,9 +1457,9 @@ const RepertoireDetail = () => {
         <Card title={`Canciones (${repertoireData.songs?.length || 0})`}>
           {!repertoireData.songs || repertoireData.songs.length === 0 ? (
             <div className="text-center py-10">
-              <MusicalNoteIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-semibold text-gray-900">No hay canciones en este repertorio</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <MusicalNoteIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-white">No hay canciones en este repertorio</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Este repertorio está vacío por el momento.
               </p>
             </div>
@@ -1515,50 +1515,50 @@ const RepertoireDetail = () => {
               
               {/* Tabla de canciones */}
               <div className="overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-600">
+                  <thead className="bg-gray-50 dark:bg-dark-700">
                     <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         #
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Título
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Autor
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Tonalidad
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Categoría
                       </th>
-                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Acciones
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-dark-600">
                     {filteredSongs.map((song: Song, index: number) => (
-                      <tr key={song._id} className="hover:bg-gray-50">
+                      <tr key={song._id} className="hover:bg-gray-50 dark:hover:bg-dark-700">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">{index + 1}</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{index + 1}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="font-medium text-gray-900">{song.title}</div>
+                          <div className="font-medium text-gray-900 dark:text-white">{song.title}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-gray-700">{song.author}</div>
+                          <div className="text-gray-700 dark:text-gray-300">{song.author}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-gray-700">{song.key}</div>
+                          <div className="text-gray-700 dark:text-gray-300">{song.key}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex flex-wrap gap-1">
                             {song.tags && song.tags.map((tag: string, tagIndex: number) => (
                               <span
                                 key={tagIndex}
-                                className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700"
+                                className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200"
                               >
                                 {tag}
                               </span>
@@ -1572,7 +1572,7 @@ const RepertoireDetail = () => {
                                 id={`move-up-${song._id}`}
                                 onClick={() => handleMoveSongUp(song._id, index)}
                                 disabled={index === 0}
-                                className={`p-1 rounded-full ${index === 0 ? 'text-gray-300' : 'text-gray-600 hover:bg-gray-100'}`}
+                                className={`p-1 rounded-full ${index === 0 ? 'text-gray-300 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-600'}`}
                                 title="Mover hacia arriba"
                               >
                                 <ArrowUpIcon className="h-4 w-4" />
@@ -1581,7 +1581,7 @@ const RepertoireDetail = () => {
                                 id={`move-down-${song._id}`}
                                 onClick={() => handleMoveSongDown(song._id, index)}
                                 disabled={index === filteredSongs.length - 1}
-                                className={`p-1 rounded-full ${index === filteredSongs.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}
+                                className={`p-1 rounded-full ${index === filteredSongs.length - 1 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-dark-600'}`}
                                 title="Mover hacia abajo"
                               >
                                 <ArrowDownIcon className="h-4 w-4" />
@@ -1590,7 +1590,7 @@ const RepertoireDetail = () => {
                           ) : (
                             <Link
                               to={`/songs/${song._id}`}
-                              className="text-primary hover:text-blue-700 font-medium"
+                              className="text-primary hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
                             >
                               Ver detalles
                             </Link>
@@ -1676,7 +1676,7 @@ const RepertoireDetail = () => {
                           onClick={() => handleMoveSongUp(song._id, index)}
                           disabled={index === 0}
                           className={`p-1 rounded hover:bg-gray-100 ${
-                            index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'
+                            index === 0 ? 'text-gray-300' : 'text-gray-600'
                           }`}
                           title="Mover arriba"
                         >
@@ -1784,7 +1784,7 @@ const RepertoireDetail = () => {
         {/* Mostrar diálogo de confirmación de eliminación */}
         {showDeleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-            <div className="bg-white rounded-lg w-full max-w-md">
+            <div className="bg-white dark:bg-dark-800 rounded-lg w-full max-w-md">
               <div className="p-4 border-b">
                 <h3 className="text-lg font-medium">Confirmar eliminación</h3>
               </div>
